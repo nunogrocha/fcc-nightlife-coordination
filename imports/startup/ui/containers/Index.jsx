@@ -4,13 +4,16 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { Events } from '../../../api/events.js';
- import Yelp from 'yelp';
-var yelp = new Yelp({
-  consumer_key: 'W0zcQL8j9GwUHwgWKUiR5w',
-  consumer_secret: 'n29WXNpzbHEsffNO9rJOVE0kvzw',
-  token: 'uVJX7CkMx-Tl8-v4EUiE1PqnBxH6J0rn',
-  token_secret: 'W1t3Wew2R1_Wr9p2XGWGVizlS14',
-});
+ 
+function callMeteorMethod(methodName, ...args) {
+    return new Promise((resolve, reject) => {
+        Meteor.call(methodName, ...args, (error, result) => {
+            if (error) reject(error)
+            else resolve(result)
+        })
+    })
+}
+ 
 class Index extends Component {
   constructor(props) {
     super(props);
@@ -18,15 +21,9 @@ class Index extends Component {
     this.state = { };
   }
 
-  getYelpEvents() {
-    yelp.search({ location: location })
-    .then(function (data) {
-      console.log(data)
-      return data;
-    })
-    .catch(function (err) {
-      console.error(err);
-    });
+  async getYelpEvents() {
+    let result = await callMeteorMethod('events.getList', "lisbon")
+    console.log(result)
   }
 
   render() {
