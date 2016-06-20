@@ -2,10 +2,15 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
-import { HTTP } from 'meteor/http';
- 
+
 import { Events } from '../../../api/events.js';
- 
+ import Yelp from 'yelp';
+var yelp = new Yelp({
+  consumer_key: 'W0zcQL8j9GwUHwgWKUiR5w',
+  consumer_secret: 'n29WXNpzbHEsffNO9rJOVE0kvzw',
+  token: 'uVJX7CkMx-Tl8-v4EUiE1PqnBxH6J0rn',
+  token_secret: 'W1t3Wew2R1_Wr9p2XGWGVizlS14',
+});
 class Index extends Component {
   constructor(props) {
     super(props);
@@ -14,21 +19,14 @@ class Index extends Component {
   }
 
   getYelpEvents() {
-    Meteor.call('events.getList', "lisbon", (error, result) => {
-        if(error) {
-          // handle error
-        } else {
-          console.log(result)
-        }
-      });
-      /*
-    HTTP.call("GET", "https://api.yelp.com/v2/search/?location=Lisbon",
-      function (error, result) {
-        if (!error) {
-          console.log(result)
-        }
-      });
-      */
+    yelp.search({ location: location })
+    .then(function (data) {
+      console.log(data)
+      return data;
+    })
+    .catch(function (err) {
+      console.error(err);
+    });
   }
 
   render() {
