@@ -18,6 +18,10 @@ Meteor.methods({
   'events.getList': async function(location) {
     check(location, String);
     
+    if(!location) {
+      location = "";
+    }
+    
     let resolve, reject
     const promise = new Promise((a, b) => { resolve = a; reject = b })
     

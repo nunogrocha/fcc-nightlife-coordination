@@ -4,7 +4,8 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { Events } from '../../../api/events.js';
- 
+import EventList from '../components/EventList.jsx';
+
 function callMeteorMethod(methodName, ...args) {
     return new Promise((resolve, reject) => {
         Meteor.call(methodName, ...args, (error, result) => {
@@ -18,12 +19,15 @@ class Index extends Component {
   constructor(props) {
     super(props);
  
-    this.state = { };
+    this.state = {
+      events: [],
+    };
   }
 
   async getYelpEvents() {
-    let result = await callMeteorMethod('events.getList', "lisbon")
-    console.log(result)
+    searchText = ReactDOM.findDOMNode(this.refs.searchText).value.trim();
+    let result = await callMeteorMethod('events.getList', searchText)
+    this.setState({events: result.businesses});
   }
 
   render() {
@@ -33,9 +37,12 @@ class Index extends Component {
           <div className="toptron">
             <h3>See which bars are hoppin' tonight and RSVP ahead of time!</h3>
             <form className="form-inline">
-              <input className="form-control margin-right-xs" type="text" placeholder="Location"/>
+              <input className="form-control margin-right-xs" type="text" ref="searchText" placeholder="Location"/>
               <div className="btn btn-success-outline margin-right-xs" onClick={this.getYelpEvents.bind(this)}>Search</div>
             </form>
+          </div>
+          <div class="list-group">
+            <EventList events={this.state.events}/>
           </div>
         </div>
       </div>
