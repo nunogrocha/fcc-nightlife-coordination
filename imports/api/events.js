@@ -13,27 +13,55 @@ var yelp = new Yelp({
 export const Events = new Mongo.Collection('events');
  
 if (Meteor.isServer) {
- 
-Meteor.methods({
-  'events.getList': async function(location) {
-    check(location, String);
     
-    if(!location) {
-      location = "";
-    }
-    
-    let resolve, reject
-    const promise = new Promise((a, b) => { resolve = a; reject = b })
-    
-    yelp.search({ location: location })
-    .then(function (data) {
-      resolve(data)
-    })
-    .catch(function (err) {
-      console.error(err);
+  Meteor.publish('event', function(eventId) {
+    return Events.find({ 
+      eventId: eventId
     });
-    
-    return promise;
-  }
-});
+  });
+
+  Meteor.methods({
+    'events.getAll'() {
+      return Events.find(
+        { }
+      );
+    },
+    'events.setGoing'(eventId) {
+      check(eventId, String);
+      console.log(eventId)
+      return Events.update(
+        { 
+          eventId: eventId
+        },
+        {
+          $inc: {
+            "going": 1
+          }
+        },
+        {
+          upsert: true
+        }
+      );
+    },
+    'events.getList': async function(location) {
+      check(location, String);
+      
+      if(!location) {
+        location = "";
+      }
+      
+      let resolve, reject
+      const promise = new Promise((a, b) => { resolve = a; reject = b })
+      
+      yelp.search({ location: location })
+      .then(function (data) {
+        resolve(data)
+      })
+      .catch(function (err) {
+        console.error(err);
+      });
+      
+      return promise;
+    }
+  }); 
 }

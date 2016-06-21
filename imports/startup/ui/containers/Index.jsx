@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 
-import { Events } from '../../../api/events.js';
 import EventList from '../components/EventList.jsx';
 
 function callMeteorMethod(methodName, ...args) {
@@ -21,12 +20,15 @@ class Index extends Component {
  
     this.state = {
       events: [],
+      loading: false,
     };
   }
 
   async getYelpEvents() {
+    this.setState({loading: true});
     searchText = ReactDOM.findDOMNode(this.refs.searchText).value.trim();
     let result = await callMeteorMethod('events.getList', searchText)
+    this.setState({loading: false});
     this.setState({events: result.businesses});
   }
 
@@ -41,7 +43,12 @@ class Index extends Component {
               <div className="btn btn-success-outline margin-right-xs" onClick={this.getYelpEvents.bind(this)}>Search</div>
             </form>
           </div>
-          <div class="list-group">
+          {
+            this.state.loading ? 
+              <div className="text-center">Loading ...</div> : 
+              <div></div>
+          }
+          <div className="list-group">
             <EventList events={this.state.events}/>
           </div>
         </div>
@@ -51,15 +58,11 @@ class Index extends Component {
 }
 
 Index.propTypes = {
-  //events: PropTypes.array.isRequired,
   currentUser: PropTypes.object,
 };
  
 export default createContainer(() => {
-  Meteor.subscribe('events');
-  
   return {
-    //events: Events.find({}, { sort: { createdAt: -1 } }).fetch(),
     currentUser: Meteor.user(),
   };
 }, Index);
