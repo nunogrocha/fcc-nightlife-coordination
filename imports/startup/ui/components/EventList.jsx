@@ -20,7 +20,6 @@ export default class EventList extends Component {
   }
 
   render() {
-    console.log(this.props.events)
     return (
       <div href="#" class="list-group-item active">
         {this.renderEvents()}
@@ -30,5 +29,5 @@ export default class EventList extends Component {
 }
  
 EventList.propTypes = {
-  events: PropTypes.object.isRequired,
+  events: PropTypes.object.isRequired
 };

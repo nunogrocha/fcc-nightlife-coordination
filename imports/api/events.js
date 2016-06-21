@@ -13,36 +13,72 @@ var yelp = new Yelp({
 export const Events = new Mongo.Collection('events');
  
 if (Meteor.isServer) {
-    
-  Meteor.publish('event', function(eventId) {
-    return Events.find({ 
-      eventId: eventId
-    });
+   
+  Meteor.publish('myEvents', function() {
+    return Events.find({ });
   });
-
+  
+  Meteor.publish('singleEvent', function(eventId) {
+    return Events.find({ eventId: eventId });
+  });
+  
+}
   Meteor.methods({
-    'events.getAll'() {
-      return Events.find(
-        { }
-      );
-    },
-    'events.setGoing'(eventId) {
+    'myEvents.getGoing'(eventId) {
       check(eventId, String);
-      console.log(eventId)
-      return Events.update(
-        { 
-          eventId: eventId
-        },
-        {
-          $inc: {
-            "going": 1
-          }
-        },
-        {
-          upsert: true
-        }
-      );
+      
+      return Events.find({ eventId: eventId }).fetch();
     },
+    'myEvents.setGoing'(eventId, userId) {
+      check(eventId, String);
+      check(userId, String);
+      
+      let event = Events.find({ 
+        eventId: eventId,
+         "users.user": userId 
+      }).fetch();
+      
+      if (event.length > 0) {
+        return Events.update(
+          { 
+            eventId: eventId
+          },
+          {
+            $inc: {
+              "going": -1
+            },
+            $pull: {
+              "users": { user: userId }
+            }
+          }
+        );
+      } else {
+        return Events.update(
+          { 
+            eventId: eventId
+          },
+          {
+            $inc: {
+              "going": 1
+            },
+            $setOnInsert: {
+              users: []
+            },
+            $push: {
+              "users": { user: userId }
+            }
+          },
+          {
+            upsert: true
+          }
+        );
+      }
+
+    }
+  });
+  
+    if (Meteor.isServer) {
+       Meteor.methods({
     'events.getList': async function(location) {
       check(location, String);
       
