@@ -5,7 +5,10 @@ import { Meteor } from 'meteor/meteor';
 import { Events } from '../../../api/events.js';
 import Event from './Event.jsx';
 
-export default class EventList extends Component {
+export default class EventList extends React.Component {
+  constructor(props) {
+    super(props);
+  }
 
   renderEvents() {
     let events = this.props.events;

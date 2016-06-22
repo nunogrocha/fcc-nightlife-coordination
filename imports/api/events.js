@@ -24,11 +24,7 @@ if (Meteor.isServer) {
   
 }
   Meteor.methods({
-    'myEvents.getGoing'(eventId) {
-      check(eventId, String);
-      
-      return Events.find({ eventId: eventId }).fetch();
-    },
+    
     'myEvents.setGoing'(eventId, userId) {
       check(eventId, String);
       check(userId, String);
@@ -77,8 +73,24 @@ if (Meteor.isServer) {
     }
   });
   
-    if (Meteor.isServer) {
-       Meteor.methods({
+if (Meteor.isServer) {
+  Meteor.methods({
+    'getGoing': async function(eventId) {
+      check(eventId, String);
+      
+      let resolve, reject
+      const promise = new Promise((a, b) => { resolve = a; reject = b })
+      
+      let event = Events.find({ 
+        eventId: eventId
+      }).fetch();
+
+      if (event) {
+        resolve(event)
+      }
+        
+      return promise;
+    },
     'events.getList': async function(location) {
       check(location, String);
       
