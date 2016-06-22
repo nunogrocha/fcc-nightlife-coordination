@@ -24,17 +24,17 @@ if (Meteor.isServer) {
   
 }
   Meteor.methods({
-    
     'myEvents.setGoing'(eventId, userId) {
       check(eventId, String);
       check(userId, String);
       
       let event = Events.find({ 
         eventId: eventId,
-         "users.user": userId 
+        "users.user": userId 
       }).fetch();
       
       if (event.length > 0) {
+        console.log("exists")
         return Events.update(
           { 
             eventId: eventId
@@ -49,6 +49,7 @@ if (Meteor.isServer) {
           }
         );
       } else {
+        console.log("update")
         return Events.update(
           { 
             eventId: eventId
@@ -56,9 +57,6 @@ if (Meteor.isServer) {
           {
             $inc: {
               "going": 1
-            },
-            $setOnInsert: {
-              users: []
             },
             $push: {
               "users": { user: userId }
@@ -75,15 +73,17 @@ if (Meteor.isServer) {
   
 if (Meteor.isServer) {
   Meteor.methods({
-    'getGoing': async function(eventId) {
+    'getGoing': async function(eventId, userId) {
       check(eventId, String);
+      check(userId, String);
       
       let resolve, reject
       const promise = new Promise((a, b) => { resolve = a; reject = b })
       
-      let event = Events.find({ 
-        eventId: eventId
-      }).fetch();
+      let event = Events.find( 
+        { eventId: eventId,
+        users: { $elemMatch: { user: userId } } }
+      ).fetch();
 
       if (event) {
         resolve(event)

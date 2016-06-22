@@ -17,6 +17,7 @@ export default class EventList extends React.Component {
         <Event
           key={key}
           event={event}
+          user={this.props.user}
         />
       );
     });
@@ -32,5 +33,6 @@ export default class EventList extends React.Component {
 }
  
 EventList.propTypes = {
-  events: PropTypes.object.isRequired
+  events: PropTypes.object.isRequired,
+  currentUser: PropTypes.object,
 };

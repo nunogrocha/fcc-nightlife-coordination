@@ -49,7 +49,7 @@ class Index extends Component {
               <div></div>
           }
           <div className="list-group">
-            <EventList events={this.state.events}/>
+            <EventList events={this.state.events} user={this.props.currentUser}/>
           </div>
         </div>
       </div>
